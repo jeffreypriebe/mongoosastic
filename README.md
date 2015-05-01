@@ -12,6 +12,7 @@ Mongoosastic is a [mongoose](http://mongoosejs.com/) plugin that can automatical
   - [Indexing nested models](#indexing-nested-models)
   - [Indexing an existing collection](#indexing-an-existing-collection)
   - [Bulk indexing](#bulk-indexing)
+  - [Filtered indexing](#filtered-indexing)
   - [Indexing on demand](#indexing-on-demand)
   - [Truncating an index](#truncating-an-index)
 - [Mapping](#mapping)
@@ -45,7 +46,8 @@ Options are:
 * `hydrate` - whether or not to lookup results in mongodb before
 * `hydrateOptions` - options to pass into hydrate function
 * `bulk` - size and delay options for bulk indexing
-* `transform` - the function used to transform serialized document before indexing 
+* `filter` - the function used for filtered indexing
+* `transform` - the function used to transform serialized document before indexing
 
 
 To have a model indexed into Elasticsearch simply add the plugin.
@@ -210,6 +212,28 @@ BookSchema.plugin(mongoosastic, {
   }
 });
 ```
+
+### Filtered Indexing
+
+You can specify a filter function to index a model to Elasticsearch based on some specific conditions.
+
+Filtering function must return True for conditions that will ignore indexing to Elasticsearch.
+
+```javascript
+var MovieSchema = new Schema({
+  title: {type: String},
+  genre: {type: String, enum: ['horror', 'action', 'adventure', 'other']}
+});
+
+MovieSchema.plugin(mongoosastic, {
+  filter: function(doc) {
+    return doc.genre === 'action';
+  }
+});
+```
+
+Instances of Movie model having 'action' as their genre will not be indexed to Elasticsearch.
+
 
 ### Indexing On Demand
 You can do on-demand indexes using the `index` function
