@@ -45,6 +45,7 @@ Options are:
 * `hydrate` - whether or not to lookup results in mongodb before
 * `hydrateOptions` - options to pass into hydrate function
 * `bulk` - size and delay options for bulk indexing
+* `transform` - the function used to transform serialized document before indexing 
 
 
 To have a model indexed into Elasticsearch simply add the plugin.
