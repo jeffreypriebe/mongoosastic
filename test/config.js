@@ -42,9 +42,13 @@ function deleteIndexIfExists(indexes, done) {
 
 function createModelAndEnsureIndex(Model, obj, cb) {
   var dude = new Model(obj);
-  dude.save(function() {
-    dude.on('es-indexed', function(err, res) {
-      setTimeout(cb, INDEXING_TIMEOUT);
+  dude.save(function(err) {
+    if (err) return dude(err);
+
+    dude.on('es-indexed', function() {
+      setTimeout(function() {
+        cb(null, dude);
+      }, INDEXING_TIMEOUT);
     });
   });
 }
@@ -57,7 +61,10 @@ function createModelAndSave(Model, obj, cb) {
 function saveAndWaitIndex(model, cb) {
   model.save(function(err) {
     if (err) cb(err);
-    else model.on('es-indexed', cb);
+    else {
+      model.once('es-indexed', cb);
+      model.once('es-filtered', cb);
+    }
   });
 }
 
